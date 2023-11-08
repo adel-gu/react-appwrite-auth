@@ -1,68 +1,94 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import React, { useRef } from 'react';
+import { Link } from 'react-router-dom';
+import { useAuth } from '../utils/AuthContext';
 
 const Register = () => {
+  const registerFrom = useRef(null);
+  const { user, rergisterUser } = useAuth();
+
+  useEffect(() => {
+    if (user) {
+      navigate('/');
+    }
+  });
+
+  const handleRegister = (e) => {
+    e.preventDefault();
+    const name = registerFrom.current.name.value;
+    const email = registerFrom.current.email.value;
+    const password = registerFrom.current.password1.value;
+    const confirmPassword = registerFrom.current.password2.value;
+
+    if (!checkConfirmedPasword(password, confirmPassword)) {
+      alert('Passwords do not match');
+      return;
+    }
+
+    const userInfo = {
+      name,
+      email,
+      password,
+    };
+    rergisterUser(userInfo);
+  };
+
+  const checkConfirmedPasword = (pwd1, pwd2) => {
+    return pwd1 === pwd2;
+  };
+
   return (
     <div className="container">
       <div className="login-register-container">
-        <form>
+        <form ref={registerFrom} onSubmit={(e) => handleRegister(e)}>
+          <div className="form-field-wrapper">
+            <label>Name:</label>
+            <input
+              required
+              type="text"
+              name="name"
+              placeholder="Enter name..."
+            />
+          </div>
 
           <div className="form-field-wrapper">
-                <label>Name:</label>
-                <input 
-                  required
-                  type="text" 
-                  name="name"
-                  placeholder="Enter name..."
-                  />
-            </div>
+            <label>Email:</label>
+            <input
+              required
+              type="email"
+              name="email"
+              placeholder="Enter email..."
+            />
+          </div>
 
-            <div className="form-field-wrapper">
-                <label>Email:</label>
-                <input 
-                  required
-                  type="email" 
-                  name="email"
-                  placeholder="Enter email..."
-                  />
-            </div>
+          <div className="form-field-wrapper">
+            <label>Password:</label>
+            <input
+              type="password"
+              name="password1"
+              placeholder="Enter password..."
+            />
+          </div>
 
-            <div className="form-field-wrapper">
-                <label>Password:</label>
-                <input 
-                  type="password"
-                  name="password1" 
-                  placeholder="Enter password..."
-                  />
-            </div>
+          <div className="form-field-wrapper">
+            <label>Confirm Password:</label>
+            <input
+              type="password"
+              name="password2"
+              placeholder="Confirm password..."
+            />
+          </div>
 
-            <div className="form-field-wrapper">
-                <label>Confirm Password:</label>
-                <input 
-                  type="password"
-                  name="password2" 
-                  placeholder="Confirm password..."
-                  />
-            </div>
-
-
-            <div className="form-field-wrapper">
-
-                <input 
-                  type="submit" 
-                  value="Register"
-                  className="btn"
-                  />
-
-            </div>
-
+          <div className="form-field-wrapper">
+            <input type="submit" value="Register" className="btn" />
+          </div>
         </form>
 
-        <p>Already have an account? <Link to="/login">Login</Link></p>
-
+        <p>
+          Already have an account? <Link to="/login">Login</Link>
+        </p>
       </div>
-  </div>
-  )
-}
+    </div>
+  );
+};
 
-export default Register
+export default Register;

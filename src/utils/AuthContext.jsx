@@ -5,7 +5,7 @@ import React, {
   createContext,
   useContext,
 } from 'react';
-import { account } from '../appwriteConfig';
+import { account, uniqueId } from '../appwriteConfig';
 
 const UserContext = createContext(null);
 
@@ -38,7 +38,30 @@ const AuthContext = ({ children }) => {
     account.deleteSessions('current');
     setUser(null);
   };
-  const rergisterUser = (userInfo) => {};
+  const rergisterUser = async (userInfo) => {
+    setIsLoading(true);
+    try {
+      const user = await account.create(
+        uniqueId,
+        userInfo.email,
+        userInfo.password,
+        userInfo.name,
+      );
+      if (!user) throw Error;
+      const response = await account.createEmailSession(
+        userInfo.email,
+        userInfo.password,
+      );
+      if (!response) throw Error;
+      let accountDetails = await account.get();
+      if (!accountDetails) throw Error;
+      setUser(accountDetails);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
   const checkUserStatus = async () => {
     setIsLoading(true);
     try {
