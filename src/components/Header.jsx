@@ -4,10 +4,10 @@ import { useAuth } from '../utils/AuthContext';
 
 const Header = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, logoutUser } = useAuth();
 
   const logoutClick = () => {
-    navigate('/login');
+    logoutUser();
   };
 
   return (
