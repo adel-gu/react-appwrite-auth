@@ -1,5 +1,11 @@
-import React, { useMemo, useState } from 'react';
-import { createContext, useContext } from 'react';
+import React, {
+  useEffect,
+  useMemo,
+  useState,
+  createContext,
+  useContext,
+} from 'react';
+import { account } from '../appwriteConfig';
 
 const UserContext = createContext(null);
 
@@ -7,10 +13,44 @@ const AuthContext = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [user, setUser] = useState(null);
 
-  const loginUser = (userInfo) => {};
-  const logoutUser = () => {};
+  useEffect(() => {
+    checkUserStatus();
+  }, []);
+
+  const loginUser = async (userInfo) => {
+    setIsLoading(true);
+    try {
+      const response = await account.createEmailSession(
+        userInfo.email,
+        userInfo.password,
+      );
+      if (!response) throw Error;
+      let accountDetails = await account.get();
+      if (!accountDetails) throw Error;
+      setUser(accountDetails);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  const logoutUser = () => {
+    account.deleteSessions('current');
+    setUser(null);
+  };
   const rergisterUser = (userInfo) => {};
-  const checkUserStatus = () => {};
+  const checkUserStatus = async () => {
+    setIsLoading(true);
+    try {
+      const accountDetails = await account.get();
+      if (!accountDetails) throw Error;
+      setUser(accountDetails);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const value = useMemo(() => {
     return {
